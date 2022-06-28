@@ -1,0 +1,27 @@
+# apiVersion: v1
+# kind: Secret
+# metadata:
+#   name: sops-keys
+#   namespace: default
+# data:
+#   # Exemplary OpenPGP keyring
+#   identity.asc: <BASE64>
+# ---
+apiVersion: kustomize.toolkit.fluxcd.io/v1beta2
+kind: Kustomization
+metadata:
+  name: project-vxy-gitops
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: project-vxy-repo
+  interval: 1m
+  path: ./ # path to kustomization.yaml
+  prune: true # Delete file will delete the resource as well
+  validation: client # Client validates the objects
+  targetNamespace: default
+  decryption: # Enable decryption
+    provider: sops
+    secretRef:
+      name: sops-gpg # Reference to 'sops-gpg' secret
